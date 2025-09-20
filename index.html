@@ -536,75 +536,62 @@ frameborder="1"
         window.frames["iframe"].location = url;
     }
 
-    // НАЧАЛО: КОД ДЛЯ ВИРТУАЛЬНЫХ КНОПОК
-    document.addEventListener('DOMContentLoaded', function() {
-        // Находим наши кнопки
-        const leftBtn = document.getElementById('leftBtn');
-        const rightBtn = document.getElementById('rightBtn');
-        const spaceBtn = document.getElementById('spaceBtn');
-
-        // Проверяем, что кнопки найдены
-        if (!leftBtn || !rightBtn || !spaceBtn) {
-            console.error("Кнопки не найдены!");
-            return;
-        }
-
-        // Функция для создания события нажатия клавиши
-        function simulateKeyEvent(keyCode, type) {
-            const event = new KeyboardEvent(type, {
-                key: keyCode,
-                code: keyCode,
-                keyCode: keyCode,
-                which: keyCode,
-                bubbles: true,
-                cancelable: true
-            });
-            document.dispatchEvent(event);
-            console.log(type + " key: " + keyCode); // Для отладки
-        }
-
-        // Обработчики для кнопки "Влево" (стрелка влево)
-        leftBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            simulateKeyEvent('ArrowLeft', 'keydown');
-        });
-        leftBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            simulateKeyEvent('ArrowLeft', 'keyup');
-        });
-
-        // Обработчики для кнопки "Вправо" (стрелка вправо)
-        rightBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            simulateKeyEvent('ArrowRight', 'keydown');
-        });
-        rightBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            simulateKeyEvent('ArrowRight', 'keyup');
-        });
-
-        // Обработчики для кнопки "Огонь" (Пробел) - ИСПРАВЛЕННЫЙ КОД
-spaceBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    simulateKeyEvent(' ', 'keydown');  // Пробел для стрельбы
-    console.log("Fire button pressed - SPACE");
-});
-spaceBtn.addEventListener('touchend', (e) => {
-    e.preventDefault();
-    simulateKeyEvent(' ', 'keyup');
-});
-
-// Также для мыши
-spaceBtn.addEventListener('mousedown', () => {
-    simulateKeyEvent(' ', 'keydown');
-    console.log("Fire button pressed (mouse) - SPACE");
-});
-        console.log("Виртуальные кнопки инициализированы");
+    function simulateKeyEvent(keyValue, type) {
+    let keyOptions;
+    
+    // Обрабатываем разные типы клавиш
+    if (keyValue === 'ArrowLeft') {
+        keyOptions = {
+            key: 'ArrowLeft',
+            code: 'ArrowLeft', 
+            keyCode: 37,
+            which: 37
+        };
+    } else if (keyValue === 'ArrowRight') {
+        keyOptions = {
+            key: 'ArrowRight',
+            code: 'ArrowRight',
+            keyCode: 39, 
+            which: 39
+        };
+    } else if (keyValue === ' ' || keyValue === 'Space') {
+        keyOptions = {
+            key: ' ',
+            code: 'Space',
+            keyCode: 32,
+            which: 32
+        };
+    } else {
+        // Для других клавиш
+        keyOptions = {
+            key: keyValue,
+            code: keyValue,
+            keyCode: keyValue,
+            which: keyValue
+        };
+    }
+    
+    const event = new KeyboardEvent(type, {
+        ...keyOptions,
+        bubbles: true,
+        cancelable: true,
+        composed: true
     });
-    // КОНЕЦ: КОД ДЛЯ ВИРТУАЛЬНЫХ КНОПОК
-
+    
+    // Отправляем событие на canvas (это важно!)
+    const canvas = document.getElementById('canvas');
+    if (canvas) {
+        canvas.dispatchEvent(event);
+    }
+    
+    // И также на документ
+    document.dispatchEvent(event);
+    
+    console.log(type + ": " + keyOptions.key + " (" + keyOptions.keyCode + ")");
+}
     </script>
 
 </body>
 </html>
+
 
