@@ -339,6 +339,33 @@ config = {
            right:10px;
            border: 1px solid black;
         }
+        .virtual-btn {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            font-size: 24px;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            touch-action: manipulation; /* Отключает масштабирование при двойном тапе */
+            user-select: none; /* Запрещает выделение текста на кнопке */
+        }
+        .virtual-btn:active {
+            background-color: rgba(0, 255, 0, 0.5); /* Меняет цвет при нажатии */
+        }
+
+        /* Скрываем кнопки по умолчанию. Они появятся только на touch-устройствах */
+        #mobileControls {
+            display: none;
+        }
+
+        /* Показываем кнопки только на устройствах с сенсорным экраном */
+        @media (hover: none) and (pointer: coarse) {
+            #mobileControls {
+                display: flex;
+            }
+        }
     </style>
 
     <script src="https://pygame-web.github.io/archives/0.9//browserfs.min.js"></script>
@@ -360,7 +387,32 @@ config = {
 width="1px"
 height="1px"
     oncontextmenu="event.preventDefault()" tabindex=1>
-    </canvas>
+    </canvas> <!-- ЗАКРЫВАЮЩИЙ ТЕГ canvas -->
+        <!-- НАЧАЛО: БЛОК ВИРТУАЛЬНЫХ КНОПОК ДЛЯ ТЕЛЕФОНА -->
+    <div id="mobileControls" style="
+        position: fixed;
+        bottom: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        touch-action: manipulation;
+        z-index: 10; /* Чтобы кнопки были поверх canvas */
+        pointer-events: auto; /* Важно! Чтобы клики проходили через прозрачные области */
+    ">
+        <!-- Блок для кнопок движения (слева) -->
+        <div id="leftRightControls" style="display: flex; align-items: center; margin-left: 20px;">
+            <button id="leftBtn" class="virtual-btn">⬅️</button>
+            <div style="width: 20px;"></div> <!-- Просто отступ -->
+            <button id="rightBtn" class="virtual-btn">➡️</button>
+        </div>
+
+        <!-- Блок для кнопок действия (справа) -->
+        <div id="actionControls" style="display: flex; align-items: center; margin-right: 20px;">
+            <button id="spaceBtn" class="virtual-btn">🔥</button>
+            <!-- Добавьте другие кнопки действий по необходимости -->
+        </div>
+    </div>
+    <!-- КОНЕЦ: БЛОК ВИРТУАЛЬНЫХ КНОПОК -->
 
     <div id=html></div>
 
@@ -419,8 +471,9 @@ frameborder="1"
         <div id="terminal" tabIndex=1 align="left"></div>
     </div>
 
-    <script type="application/javascript">
+        <script type="application/javascript">
 
+    // ФУНКЦИИ ДЛЯ PYGABG - ДОЛЖНЫ БЫТЬ В НАЧАЛЕ
     async function custom_onload(debug_hidden) {
         // this is called before anything python is loaded
         // make your js customization here
@@ -482,6 +535,75 @@ frameborder="1"
     function frame_online(url) {
         window.frames["iframe"].location = url;
     }
+
+    // НАЧАЛО: КОД ДЛЯ ВИРТУАЛЬНЫХ КНОПОК
+    document.addEventListener('DOMContentLoaded', function() {
+        // Находим наши кнопки
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
+        const spaceBtn = document.getElementById('spaceBtn');
+
+        // Проверяем, что кнопки найдены
+        if (!leftBtn || !rightBtn || !spaceBtn) {
+            console.error("Кнопки не найдены!");
+            return;
+        }
+
+        // Функция для создания события нажатия клавиши
+        function simulateKeyEvent(keyCode, type) {
+            const event = new KeyboardEvent(type, {
+                key: keyCode,
+                code: keyCode,
+                keyCode: keyCode,
+                which: keyCode,
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(event);
+            console.log(type + " key: " + keyCode); // Для отладки
+        }
+
+        // Обработчики для кнопки "Влево" (стрелка влево)
+        leftBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            simulateKeyEvent('ArrowLeft', 'keydown');
+        });
+        leftBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            simulateKeyEvent('ArrowLeft', 'keyup');
+        });
+
+        // Обработчики для кнопки "Вправо" (стрелка вправо)
+        rightBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            simulateKeyEvent('ArrowRight', 'keydown');
+        });
+        rightBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            simulateKeyEvent('ArrowRight', 'keyup');
+        });
+
+        // Обработчики для кнопки "Огонь" (Пробел)
+        spaceBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            simulateKeyEvent(' ', 'keydown');
+        });
+        spaceBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            simulateKeyEvent(' ', 'keyup');
+        });
+
+        // Также добавляем поддержку мыши для тестирования на ПК
+        leftBtn.addEventListener('mousedown', () => simulateKeyEvent('ArrowLeft', 'keydown'));
+        leftBtn.addEventListener('mouseup', () => simulateKeyEvent('ArrowLeft', 'keyup'));
+        rightBtn.addEventListener('mousedown', () => simulateKeyEvent('ArrowRight', 'keydown'));
+        rightBtn.addEventListener('mouseup', () => simulateKeyEvent('ArrowRight', 'keyup'));
+        spaceBtn.addEventListener('mousedown', () => simulateKeyEvent(' ', 'keydown'));
+        spaceBtn.addEventListener('mouseup', () => simulateKeyEvent(' ', 'keyup'));
+
+        console.log("Виртуальные кнопки инициализированы");
+    });
+    // КОНЕЦ: КОД ДЛЯ ВИРТУАЛЬНЫХ КНОПОК
 
     </script>
 
