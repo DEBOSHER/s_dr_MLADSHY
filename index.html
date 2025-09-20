@@ -536,7 +536,7 @@ frameborder="1"
         window.frames["iframe"].location = url;
     }
 
-    function simulateKeyEvent(keyValue, type) {
+        function simulateKeyEvent(keyValue, type) {
         let keyOptions;
         
         // Обрабатываем разные типы клавиш
@@ -555,14 +555,14 @@ frameborder="1"
                 which: 39
             };
         } else if (keyValue === ' ' || keyValue === 'Space') {
+            // ПРАВИЛЬНЫЙ обработчик для ПРОБЕЛА
             keyOptions = {
-                key: ' ',
-                code: 'Space',
-                keyCode: 32,
-                which: 32
+                key: ' ',           // Важно: пробел как символ
+                code: 'Space',      // Код пробела
+                keyCode: 32,        // Числовой код пробела
+                which: 32           // Альтернативный код
             };
         } else {
-            // Для других клавиш
             keyOptions = {
                 key: keyValue,
                 code: keyValue,
@@ -572,22 +572,23 @@ frameborder="1"
         }
         
         const event = new KeyboardEvent(type, {
-            ...keyOptions,
+            key: keyOptions.key,
+            code: keyOptions.code,
+            keyCode: keyOptions.keyCode,
+            which: keyOptions.which,
             bubbles: true,
             cancelable: true,
             composed: true
         });
         
-        // Отправляем событие на canvas (это важно!)
+        // Пробуем оба варианта
         const canvas = document.getElementById('canvas');
         if (canvas) {
             canvas.dispatchEvent(event);
         }
-        
-        // И также на документ
         document.dispatchEvent(event);
         
-        console.log(type + ": " + keyOptions.key + " (" + keyOptions.keyCode + ")");
+        console.log(type + ": " + keyOptions.key + " (code: " + keyOptions.keyCode + ")");
     }
 
     // НАЧАЛО: КОД ДЛЯ ВИРТУАЛЬНЫХ КНОПОК
@@ -649,6 +650,7 @@ frameborder="1"
 
 </body>
 </html>
+
 
 
 
