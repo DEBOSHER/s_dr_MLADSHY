@@ -583,24 +583,22 @@ frameborder="1"
             simulateKeyEvent('ArrowRight', 'keyup');
         });
 
-        // Обработчики для кнопки "Огонь" (Пробел)
-        spaceBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            simulateKeyEvent(' ', 'keydown');
-        });
-        spaceBtn.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            simulateKeyEvent(' ', 'keyup');
-        });
+        // Обработчики для кнопки "Огонь" (Пробел) - ИСПРАВЛЕННЫЙ КОД
+spaceBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    simulateKeyEvent(' ', 'keydown');  // Пробел для стрельбы
+    console.log("Fire button pressed - SPACE");
+});
+spaceBtn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    simulateKeyEvent(' ', 'keyup');
+});
 
-        // Также добавляем поддержку мыши для тестирования на ПК
-        leftBtn.addEventListener('mousedown', () => simulateKeyEvent('ArrowLeft', 'keydown'));
-        leftBtn.addEventListener('mouseup', () => simulateKeyEvent('ArrowLeft', 'keyup'));
-        rightBtn.addEventListener('mousedown', () => simulateKeyEvent('ArrowRight', 'keydown'));
-        rightBtn.addEventListener('mouseup', () => simulateKeyEvent('ArrowRight', 'keyup'));
-        spaceBtn.addEventListener('mousedown', () => simulateKeyEvent(' ', 'keydown'));
-        spaceBtn.addEventListener('mouseup', () => simulateKeyEvent(' ', 'keyup'));
-
+// Также для мыши
+spaceBtn.addEventListener('mousedown', () => {
+    simulateKeyEvent(' ', 'keydown');
+    console.log("Fire button pressed (mouse) - SPACE");
+});
         console.log("Виртуальные кнопки инициализированы");
     });
     // КОНЕЦ: КОД ДЛЯ ВИРТУАЛЬНЫХ КНОПОК
@@ -609,3 +607,4 @@ frameborder="1"
 
 </body>
 </html>
+
